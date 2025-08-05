@@ -29,13 +29,16 @@
   "homepage": "https://github.com/eduardoddmg/fastify-api#readme",
   "description": "",
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^24.2.0",
     "prisma": "^6.13.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@fastify/jwt": "^9.1.0",
     "@prisma/client": "^6.13.0",
+    "bcrypt": "^6.0.0",
     "fastify": "^5.4.0",
     "zod": "^3.25.76",
     "zod-to-json-schema": "^3.24.6"
