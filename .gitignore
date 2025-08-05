@@ -1,6 +1,44 @@
-node_modules
-# Keep environment variables out of version control
-.env
+# Dependencies
+# Ignora a pasta com todas as dependências do projeto
+/node_modules
 
-/src/generated/prisma
-prisma
+# Build output
+# Ignora a pasta de saída da compilação do TypeScript
+/dist
+/build
+
+# Logs
+# Ignora arquivos de log que podem ser gerados
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Prisma
+# ===================================================================
+
+# IGNORA o arquivo do banco de dados local (se usar SQLite)
+# Este é o seu banco de dados de desenvolvimento, cada desenvolvedor deve ter o seu.
+/prisma/*.db
+/prisma/*.db-journal*
+
+# IGNORA o arquivo de ambiente com as senhas e chaves do banco de dados e JWT
+# ESSENCIAL PARA SEGURANÇA!
+.env
+.env.*
+!.env.example
+
+# ===================================================================
+
+# Editor/OS specific
+# Ignora arquivos gerados por sistemas operacionais e editores de código
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
