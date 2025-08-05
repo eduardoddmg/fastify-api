@@ -8,7 +8,7 @@ export async function userRoutes(app: FastifyInstance) {
     const createUserBody = z.object({
       name: z.string().min(3),
       email: z.string().email(),
-      password: z.string().min(6), // Aumentei o mínimo para senhas mais seguras
+      password: z.string().min(6),
     });
 
     const { name, email, password } = createUserBody.parse(request.body);
@@ -21,7 +21,6 @@ export async function userRoutes(app: FastifyInstance) {
       return reply.status(409).send({ message: 'E-mail já cadastrado.' });
     }
 
-    // Hash da senha antes de salvar
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -29,11 +28,10 @@ export async function userRoutes(app: FastifyInstance) {
       data: {
         name,
         email,
-        password: hashedPassword, // Salva a senha com hash
+        password: hashedPassword,
       },
     });
 
-    // Não retorne a senha, mesmo que hasheada
     const { password: _, ...userWithoutPassword } = user;
 
     return reply.status(201).send(userWithoutPassword);
@@ -47,7 +45,6 @@ export async function userRoutes(app: FastifyInstance) {
 
     const { email, password } = loginUserBody.parse(request.body);
 
-    // 1. Verificar se o usuário existe
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -56,24 +53,20 @@ export async function userRoutes(app: FastifyInstance) {
       return reply.status(401).send({ message: 'Credenciais inválidas.' });
     }
 
-    // 2. Comparar a senha fornecida com a senha hasheada no banco
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (!isPasswordCorrect) {
       return reply.status(401).send({ message: 'Credenciais inválidas.' });
     }
 
-    // 3. Gerar o token JWT
     const token = await reply.jwtSign(
       {
-        // Payload: informações que você quer incluir no token
         name: user.name,
       },
       {
-        // Configurações do token
         sign: {
-          sub: user.id, // 'subject' do token, geralmente o ID do usuário
-          expiresIn: '7d', // Token expira em 7 dias
+          sub: user.id,
+          expiresIn: '7d',
         },
       }
     );
