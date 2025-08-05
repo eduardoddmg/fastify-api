@@ -1,13 +1,24 @@
 import Fastify from 'fastify';
 import { appRoutes } from './routes';
 import { ZodError } from 'zod';
+import fastifyJwt from '@fastify/jwt';
+import { userRoutes } from './modules/user/user.route';
+import { taskRoutes } from './modules/task/task.routes';
 
 const app = Fastify();
 
-// Registra as rotas da aplicação
-app.register(appRoutes);
+app.register(userRoutes, {
+  prefix: '/user',
+});
 
-// Tratamento de erros global com Zod
+app.register(taskRoutes, {
+  prefix: '/task',
+});
+
+app.register(fastifyJwt, {
+  secret: 'supersecret',
+});
+
 app.setErrorHandler((error, request, reply) => {
   if (error instanceof ZodError) {
     return reply.status(400).send({
@@ -16,8 +27,7 @@ app.setErrorHandler((error, request, reply) => {
     });
   }
 
-  // Outros erros podem ser tratados aqui
-  console.error(error); // É bom logar o erro para debug
+  console.error(error);
 
   return reply.status(500).send({ message: 'Erro interno do servidor' });
 });
