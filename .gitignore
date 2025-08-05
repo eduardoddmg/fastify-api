@@ -22,6 +22,7 @@ pnpm-debug.log*
 # Este é o seu banco de dados de desenvolvimento, cada desenvolvedor deve ter o seu.
 /prisma/*.db
 /prisma/*.db-journal*
+/prisma
 
 # IGNORA o arquivo de ambiente com as senhas e chaves do banco de dados e JWT
 # ESSENCIAL PARA SEGURANÇA!
