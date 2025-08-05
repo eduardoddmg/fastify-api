@@ -5,10 +5,8 @@ import { authenticate } from '../../hooks/auth';
 import { Status } from '@prisma/client';
 
 export async function taskRoutes(app: FastifyInstance) {
-  // Aplica o hook de autenticação a TODAS as rotas deste plugin
   app.addHook('onRequest', authenticate);
 
-  // ROTA: Criar uma nova tarefa
   app.post('/', async (request, reply) => {
     const createTaskBody = z.object({
       title: z.string().min(3),
@@ -16,7 +14,7 @@ export async function taskRoutes(app: FastifyInstance) {
     });
 
     const { title, description } = createTaskBody.parse(request.body);
-    const userId = request.user.sub; // ID do usuário vem do token JWT
+    const userId = request.user.sub;
 
     const task = await prisma.task.create({
       data: {
@@ -29,7 +27,6 @@ export async function taskRoutes(app: FastifyInstance) {
     return reply.status(201).send(task);
   });
 
-  // ROTA: Listar todas as tarefas do usuário (com paginação, busca e filtro)
   app.get('/', async (request, reply) => {
     const getTasksQuery = z.object({
       page: z.coerce.number().min(1).default(1),
@@ -46,7 +43,6 @@ export async function taskRoutes(app: FastifyInstance) {
     const skip = (page - 1) * pageSize;
     const take = pageSize;
 
-    // Constrói a cláusula 'where' dinamicamente
     const where = {
       userId,
       ...(search && { title: { contains: search, mode: 'insensitive' } }),
@@ -73,7 +69,6 @@ export async function taskRoutes(app: FastifyInstance) {
     });
   });
 
-  // ROTA: Atualizar uma tarefa
   app.put('/:id', async (request, reply) => {
     const updateTaskParams = z.object({ id: z.string().uuid() });
     const updateTaskBody = z.object({
@@ -86,7 +81,6 @@ export async function taskRoutes(app: FastifyInstance) {
     const data = updateTaskBody.parse(request.body);
     const userId = request.user.sub;
 
-    // Verifica se a tarefa existe e se pertence ao usuário logado
     const taskExists = await prisma.task.findFirst({ where: { id, userId } });
     if (!taskExists) {
       return reply
@@ -102,13 +96,11 @@ export async function taskRoutes(app: FastifyInstance) {
     return reply.status(200).send(updatedTask);
   });
 
-  // ROTA: Deletar uma tarefa
   app.delete('/:id', async (request, reply) => {
     const deleteTaskParams = z.object({ id: z.string().uuid() });
     const { id } = deleteTaskParams.parse(request.params);
     const userId = request.user.sub;
 
-    // Verifica se a tarefa existe e se pertence ao usuário logado
     const taskExists = await prisma.task.findFirst({ where: { id, userId } });
     if (!taskExists) {
       return reply
